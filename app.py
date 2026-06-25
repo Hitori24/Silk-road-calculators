@@ -4,8 +4,8 @@ import pandas as pd
 # Set page config
 st.set_page_config(page_title="Silk Road Trade Optimizer", layout="wide")
 
-# Map of cities based on the sequence in the PDF
-cities_sequence = ["Tyre", "Antioch", "Damascus", "Palmyra", "Ctesiphon", "Ecbatana", "Susa", "Isfahan"]
+# Map of cities based on the sequence in the PDF, now including Pelpolis for accurate distance!
+cities_sequence = ["Tyre", "Antioch", "Damascus", "Palmyra", "Ctesiphon", "Ecbatana", "Susa", "Pelpolis", "Isfahan"]
 
 # Define categories for bonus matching
 item_categories = {
@@ -52,6 +52,11 @@ trade_data = {
         "local": {"Sesame": 102, "Saffron": 256, "Books": 510, "Clay": 11, "Wool": 10, "Linen": 10},
         "imports": {"Sea Salt": 99, "Coriander": 156, "Earthenware": 35, "Glassware": 233, "Paper": 68, "Tools": 121, "Weapons": 144, "Wheat": 22, "Barley": 16, "Olive Oil": 68, "Dried Fish": 35, "Hides": 25, "Cotton Yarn": 33, "Leather": 15, "Copper Ingot": 43, "Iron Ingot": 68}
     },
+    "Pelpolis": {
+        "culture": "Persian", "hasGlobalBonus": False, "foreignBonus": False, "foreignPenalty": False, "bonusCategories": [],
+        "local": {}, # Goods are no longer traded here
+        "imports": {} # Goods are no longer traded here
+    },
     "Isfahan": {
         "culture": "Persian", "hasGlobalBonus": False, "foreignBonus": False, "foreignPenalty": True, "bonusCategories": ["Tools", "Textile"],
         "local": {"Minanakari Ware": 306, "Glassware": 204, "Paper": 52, "Tools": 102, "Olive Oil": 52, "Coriander": 134},
@@ -61,7 +66,7 @@ trade_data = {
 
 # --- UI Header ---
 st.title("🐪 Silk Road Trade Optimizer")
-st.markdown("Easily calculate the best routes, nearest drops, and optimal profit margins based on the game's actual math.")
+st.markdown("Calculate the best routes, nearest drops, and optimal profit margins based on the game's actual math.")
 
 # --- Setup Selection UI ---
 col1, col2, col3 = st.columns(3)
@@ -73,84 +78,89 @@ with col3:
     sort_option = st.selectbox("Sort Routes By:", ["Highest Base Profit", "Nearest Distance", "Bonuses First"])
 
 st.divider()
-st.subheader(f"Best export options from {current_city}")
 
-# --- Route Calculation Logic ---
-current_city_data = trade_data[current_city]
-source_index = cities_sequence.index(current_city)
-
-valid_routes = []
-
-for product, buy_price in current_city_data["local"].items():
-    category = item_categories.get(product, "General")
-    
-    for target_city, target_data in trade_data.items():
-        if target_city == current_city:
-            continue
-            
-        if product in target_data["imports"]:
-            sell_price = target_data["imports"][product]
-            base_profit = sell_price - buy_price
-            target_index = cities_sequence.index(target_city)
-            distance = abs(source_index - target_index)
-            
-            # Flags
-            bonuses = []
-            penalties = []
-            has_bonus = False
-            
-            if category in target_data["bonusCategories"]:
-                bonuses.append(f"🌟 Category Bonus ({category})")
-                has_bonus = True
-            if target_data["hasGlobalBonus"]:
-                bonuses.append("🌟 Global City Bonus (+5%)")
-                has_bonus = True
-                
-            is_foreign = current_city_data["culture"] != target_data["culture"]
-            if is_foreign and target_data["foreignBonus"]:
-                bonuses.append("🌟 Foreign Trader Bonus (+10%)")
-                has_bonus = True
-            if is_foreign and target_data["foreignPenalty"]:
-                penalties.append("❌ Foreign Penalty (-10%)")
-                
-            valid_routes.append({
-                "product": product, "category": category, "destination": target_city,
-                "buy_price": buy_price, "sell_price": sell_price, "base_profit": base_profit,
-                "distance": distance, "bonuses": bonuses, "penalties": penalties, "has_bonus": has_bonus
-            })
-
-# --- Sorting Logic ---
-if sort_option == "Highest Base Profit":
-    valid_routes.sort(key=lambda x: x["base_profit"], reverse=True)
-elif sort_option == "Nearest Distance":
-    valid_routes.sort(key=lambda x: (x["distance"], -x["base_profit"]))
-elif sort_option == "Bonuses First":
-    valid_routes.sort(key=lambda x: (not x["has_bonus"], -x["base_profit"]))
-
-# --- Rendering the Output ---
-if not valid_routes:
-    st.info("No profitable export routes found from this city.")
+if current_city == "Pelpolis":
+    st.warning("Goods are no longer traded in Pelpolis. Please select another city to begin trading.")
 else:
-    for route in valid_routes:
-        with st.container(border=True):
-            r_col1, r_col2, r_col3 = st.columns([3, 2, 2])
-            
-            with r_col1:
-                st.markdown(f"### 📦 {route['product']}")
-                st.caption(f"Category: {route['category']}")
+    st.subheader(f"Best export options from {current_city}")
+
+    # --- Route Calculation Logic ---
+    current_city_data = trade_data[current_city]
+    source_index = cities_sequence.index(current_city)
+
+    valid_routes = []
+
+    for product, buy_price in current_city_data["local"].items():
+        category = item_categories.get(product, "General")
+        
+        for target_city, target_data in trade_data.items():
+            # Skip checking the city you are currently in, and skip Pelpolis as a destination
+            if target_city == current_city or target_city == "Pelpolis":
+                continue
                 
-                if route['distance'] == 1:
-                    st.markdown("`⚠️ Nearest Neighbor`")
-                    
-                for b in route['bonuses']:
-                    st.markdown(f"`{b}`")
-                for p in route['penalties']:
-                    st.markdown(f"`{p}`")
-                    
-            with r_col2:
-                st.markdown(f"**➡️ Destination:** {route['destination']}")
-                st.caption(f"Distance: {route['distance']} stops")
-                st.markdown(f"**Buy:** ${route['buy_price']} | **Sell:** ${route['sell_price']}")
+            if product in target_data["imports"]:
+                sell_price = target_data["imports"][product]
+                base_profit = sell_price - buy_price
+                target_index = cities_sequence.index(target_city)
+                distance = abs(source_index - target_index)
                 
-            with r_col3:
-                st.metric("Base Profit / Item", f"+${route['base_profit']}")
+                # Flags
+                bonuses = []
+                penalties = []
+                has_bonus = False
+                
+                if category in target_data["bonusCategories"]:
+                    bonuses.append(f"🌟 Category Bonus ({category})")
+                    has_bonus = True
+                if target_data["hasGlobalBonus"]:
+                    bonuses.append("🌟 Global City Bonus (+5%)")
+                    has_bonus = True
+                    
+                is_foreign = current_city_data["culture"] != target_data["culture"]
+                if is_foreign and target_data["foreignBonus"]:
+                    bonuses.append("🌟 Foreign Trader Bonus (+10%)")
+                    has_bonus = True
+                if is_foreign and target_data["foreignPenalty"]:
+                    penalties.append("❌ Foreign Penalty (-10%)")
+                    
+                valid_routes.append({
+                    "product": product, "category": category, "destination": target_city,
+                    "buy_price": buy_price, "sell_price": sell_price, "base_profit": base_profit,
+                    "distance": distance, "bonuses": bonuses, "penalties": penalties, "has_bonus": has_bonus
+                })
+
+    # --- Sorting Logic ---
+    if sort_option == "Highest Base Profit":
+        valid_routes.sort(key=lambda x: x["base_profit"], reverse=True)
+    elif sort_option == "Nearest Distance":
+        valid_routes.sort(key=lambda x: (x["distance"], -x["base_profit"]))
+    elif sort_option == "Bonuses First":
+        valid_routes.sort(key=lambda x: (not x["has_bonus"], -x["base_profit"]))
+
+    # --- Rendering the Output ---
+    if not valid_routes:
+        st.info("No profitable export routes found from this city.")
+    else:
+        for route in valid_routes:
+            with st.container(border=True):
+                r_col1, r_col2, r_col3 = st.columns([3, 2, 2])
+                
+                with r_col1:
+                    st.markdown(f"### 📦 {route['product']}")
+                    st.caption(f"Category: {route['category']}")
+                    
+                    if route['distance'] == 1:
+                        st.markdown("`⚠️ Nearest Neighbor`")
+                        
+                    for b in route['bonuses']:
+                        st.markdown(f"`{b}`")
+                    for p in route['penalties']:
+                        st.markdown(f"`{p}`")
+                        
+                with r_col2:
+                    st.markdown(f"**➡️ Destination:** {route['destination']}")
+                    st.caption(f"Distance: {route['distance']} stops")
+                    st.markdown(f"**Buy:** ${route['buy_price']} | **Sell:** ${route['sell_price']}")
+                    
+                with r_col3:
+                    st.metric("Base Profit / Item", f"+${route['base_profit']}")
