@@ -40,7 +40,6 @@ trade_data = {
     "Ctesiphon": {
         "culture": "Persian", "hasGlobalBonus": False, "foreignBonus": False, "foreignPenalty": False, "bonusCategories": ["Luxury"],
         "local": {"Tools": 87, "Sesame": 87, "Coriander": 114, "Earthenware": 18, "Glassware": 174, "Paper": 44, "Cotton Yarn": 18, "Wheat": 9, "Olive Oil": 44},
-        # NOTE: Books price updated to 606 here based on your field data!
         "imports": {"Weapon": 142, "Sea Salt": 96, "Saffron": 233, "Books": 606, "Clay": 20, "Wool": 14, "Linen": 14, "Hides": 24, "Leather": 14, "Barley": 14, "Dried Fish": 42}
     },
     "Ecbatana": {
@@ -61,7 +60,8 @@ trade_data = {
     "Isfahan": {
         "culture": "Persian", "hasGlobalBonus": False, "foreignBonus": False, "foreignPenalty": True, "bonusCategories": ["Tools", "Textile"],
         "local": {"Minanakari Ware": 306, "Glassware": 204, "Paper": 52, "Tools": 102, "Olive Oil": 52, "Coriander": 134},
-        "imports": {"Books": 551, "Earthenware": 58, "Clay": 22, "Wool": 21, "Linen": 21, "Hides": 43, "Cotton Yarn": 56, "Leather": 30, "Copper Ingot": 61, "Iron Ingot": 89, "Weapons": 168, "Wheat": 45, "Barley": 31, "Dried Fish": 58, "Sea Salt": 119, "Sesame": 121, "Saffron": 287}
+        # NOTE: Books price updated to 531 here based on your field data screenshot!
+        "imports": {"Books": 531, "Earthenware": 58, "Clay": 22, "Wool": 21, "Linen": 21, "Hides": 43, "Cotton Yarn": 56, "Leather": 30, "Copper Ingot": 61, "Iron Ingot": 89, "Weapons": 168, "Wheat": 45, "Barley": 31, "Dried Fish": 58, "Sea Salt": 119, "Sesame": 121, "Saffron": 287}
     }
 }
 
