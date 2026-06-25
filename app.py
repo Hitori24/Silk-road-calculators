@@ -4,7 +4,7 @@ import pandas as pd
 # Set page config
 st.set_page_config(page_title="Silk Road Trade Optimizer", layout="wide")
 
-# Map of cities based on the sequence in the PDF, now including Pelpolis for accurate distance!
+# Map of cities based on the sequence in the PDF
 cities_sequence = ["Tyre", "Antioch", "Damascus", "Palmyra", "Ctesiphon", "Ecbatana", "Susa", "Pelpolis", "Isfahan"]
 
 # Define categories for bonus matching
@@ -15,7 +15,7 @@ item_categories = {
     "Linen": "Textile", "Wool": "Textile", "Wools": "Textile", "Cotton Yarn": "Textile", "Leather": "Textile", "Leathers": "Textile", "Hides": "Textile"
 }
 
-# Trade Data Dictionary built from your PDF
+# Trade Data Dictionary built from your PDF and your custom in-game data
 trade_data = {
     "Tyre": {
         "culture": "Greek", "hasGlobalBonus": True, "foreignBonus": False, "foreignPenalty": False, "bonusCategories": [],
@@ -40,7 +40,8 @@ trade_data = {
     "Ctesiphon": {
         "culture": "Persian", "hasGlobalBonus": False, "foreignBonus": False, "foreignPenalty": False, "bonusCategories": ["Luxury"],
         "local": {"Tools": 87, "Sesame": 87, "Coriander": 114, "Earthenware": 18, "Glassware": 174, "Paper": 44, "Cotton Yarn": 18, "Wheat": 9, "Olive Oil": 44},
-        "imports": {"Weapon": 142, "Sea Salt": 96, "Saffron": 233, "Books": 476, "Clay": 20, "Wool": 14, "Linen": 14, "Hides": 24, "Leather": 14, "Barley": 14, "Dried Fish": 42}
+        # NOTE: Books price updated to 606 here based on your field data!
+        "imports": {"Weapon": 142, "Sea Salt": 96, "Saffron": 233, "Books": 606, "Clay": 20, "Wool": 14, "Linen": 14, "Hides": 24, "Leather": 14, "Barley": 14, "Dried Fish": 42}
     },
     "Ecbatana": {
         "culture": "Persian", "hasGlobalBonus": False, "foreignBonus": False, "foreignPenalty": True, "bonusCategories": [],
@@ -54,8 +55,8 @@ trade_data = {
     },
     "Pelpolis": {
         "culture": "Persian", "hasGlobalBonus": False, "foreignBonus": False, "foreignPenalty": False, "bonusCategories": [],
-        "local": {}, # Goods are no longer traded here
-        "imports": {} # Goods are no longer traded here
+        "local": {}, 
+        "imports": {} 
     },
     "Isfahan": {
         "culture": "Persian", "hasGlobalBonus": False, "foreignBonus": False, "foreignPenalty": True, "bonusCategories": ["Tools", "Textile"],
